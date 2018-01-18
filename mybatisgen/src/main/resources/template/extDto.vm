@@ -1,0 +1,14 @@
+package ${extDtoPackage};
+
+import ${dtoPackage}.${className}${dtoSuffix};
+
+import java.io.Serializable;
+
+public class ${className}${extDtoSuffix} extends ${className}${dtoSuffix}  implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public ${className}${extDtoSuffix}(){
+        super();
+    }
+}

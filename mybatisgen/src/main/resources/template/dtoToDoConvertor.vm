@@ -1,0 +1,44 @@
+package ${formToDoConvertorPackage};
+
+import com.lark.middleware.model.convertor.IDataConvertor;
+import ${doPackage}.${className}${doSuffix};
+import ${dtoPackage}.${className}${dtoSuffix};
+
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
+
+
+@Component
+public class ${className}${dtoToDoConvertorSuffix} implements IDataConvertor<${className}${dtoSuffix}, ${className}${doSuffix}>, InitializingBean {
+
+    @Override
+    public ${className}${doSuffix} convertor(${className}${dtoSuffix} ${propertyName}${dtoSuffix}) {
+        ${className}${doSuffix} ${propertyName}${doSuffix} = new ${className}${doSuffix}();
+        return this.convertor(${propertyName}${dtoSuffix}, ${propertyName}${doSuffix} );
+    }
+
+    @Override
+    public ${className}${doSuffix} convertor(${className}${dtoSuffix} ${propertyName}${dtoSuffix},${className}${doSuffix} ${propertyName}${doSuffix}) {
+#foreach($item in $tableInfo.getColumnFilterByType())
+        // ${velocityCount}. ${item.comment}
+        ${propertyName}${doSuffix}.${item.setMethod}(${propertyName}${dtoSuffix}.${item.getMethod}()) ;
+#end
+        return ${propertyName}${doSuffix};
+    }
+
+    @Override
+    public Class<${className}${dtoSuffix}> getSourceClass(){
+        return ${className}${dtoSuffix}.class;
+    }
+
+    @Override
+    public Class<${className}${doSuffix}> getTargetClass(){
+        return ${className}${doSuffix}.class;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.register();
+    }
+
+}

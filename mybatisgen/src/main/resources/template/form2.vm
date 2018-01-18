@@ -1,0 +1,55 @@
+package ${formPackage};
+
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
+import ${doPackage}.${className}${doSuffix};
+
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.Length;
+import javax.validation.constraints.NotNull;
+
+import java.io.Serializable;
+import java.util.Date;
+
+public class ${className}${formSuffix} implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public ${className}${formSuffix}(){
+
+    }
+
+#foreach($item in $tableInfo.getColumnFilterByType("gmtCreate", "gmtModified","version"))
+    /**
+     * ${item.comment}
+     * This field corresponds to the database column ${tableName}.${item.columnName}
+     */
+#if(!${item.getNullable()} && ${item.type} != "id")
+#if(${item.javaType} == "String")
+    @NotBlank(message = "$!{item.getSimpleComment()}不能为空")
+#else
+    @NotNull(message = "$!{item.getSimpleComment()}不能为空")
+#end
+#end
+#if(${item.javaType} == "String")
+    @Length(max = ${item.length}, message = "$!{item.getSimpleComment()}超长")
+#end
+    private ${item.javaType} ${item.propName};
+
+#end
+#foreach($item in $tableInfo.getColumnFilterByType("gmtCreate", "gmtModified","version"))
+	public ${item.javaType} ${item.getMethod}() {
+		return ${item.propName};
+	}
+
+	public void ${item.setMethod}(${item.javaType} ${item.propName}) {
+		this.${item.propName} = ${item.propName};
+	}
+#end
+
+    @Override
+    public String toString(){
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.DEFAULT_STYLE);
+    }
+}

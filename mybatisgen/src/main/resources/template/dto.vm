@@ -1,0 +1,40 @@
+package ${dtoPackage};
+
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+
+import java.io.Serializable;
+import java.util.Date;
+
+public class ${className}${dtoSuffix} implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public ${className}${dtoSuffix}(){
+
+    }
+
+#foreach($item in $tableInfo.columns)
+    /**
+     * ${item.comment}
+     * This field corresponds to the database column ${tableName}.${item.columnName}
+     */
+    private ${item.javaType} ${item.propName};
+
+#end
+#foreach($item in $tableInfo.columns)
+	public ${item.javaType} ${item.getMethod}() {
+		return ${item.propName};
+	}
+
+	public void ${item.setMethod}(${item.javaType} ${item.propName}) {
+		this.${item.propName} = ${item.propName};
+	}
+
+#end
+
+    @Override
+    public String toString(){
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.DEFAULT_STYLE);
+    }
+}

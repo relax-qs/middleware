@@ -1,0 +1,14 @@
+package ${extManagerPackage};
+
+import ${managerPackage}.${className}${managerSuffix};
+
+import java.util.List;
+
+
+/**
+ * ManagerExt for ${className}.
+ * 自定义的manager接口
+ */
+public interface ${className}${extManagerSuffix} extends ${className}${managerSuffix} {
+
+}

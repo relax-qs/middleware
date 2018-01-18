@@ -1,0 +1,108 @@
+<config>
+    <dbConfig>
+        <driver>com.mysql.jdbc.Driver</driver>
+        <url>jdbc:mysql://192.168.0.99:3306/db_etb?useUnicode=true&amp;characterEncoding=UTF-8</url>
+
+        <user>root</user>
+        <pwd></pwd>
+        <tablePrefix>etb_</tablePrefix>
+    </dbConfig>
+    <params>
+
+        <param>
+            <name>doPackage</name>
+            <value>com.lark.etb.common.model</value>
+        </param>
+        <param>
+            <name>queryPackage</name>
+            <value>com.lark.etb.common.query</value>
+        </param>
+
+        <param>
+            <name>mapperPackage</name>
+            <value>com.lark.etb.core.dal.mapper</value>
+        </param>
+
+        <param>
+            <name>managerPackage</name>
+            <value>com.lark.etb.core.manager</value>
+        </param>
+
+        <param>
+            <name>managerImplPackage</name>
+            <value>com.lark.etb.core.manager</value>
+        </param>
+
+        <param>
+            <name>mapperExtPackage</name>
+            <value>com.lark.etb.core.dal.mapper.ext</value>
+        </param>
+
+        <param>
+            <name>queryPrefix</name>
+            <value>Query</value>
+        </param>
+
+        <param>
+            <name>mapperSuffix</name>
+            <value>Mapper</value>
+        </param>
+
+        <param>
+            <name>queryPrefix</name>
+            <value>Query</value>
+        </param>
+
+        <param>
+            <name>managerSuffix</name>
+            <value>Manager</value>
+        </param>
+
+        <param>
+            <name>managerImplSuffix</name>
+            <value>ManagerImpl</value>
+        </param>
+
+        <param>
+            <name>mapperExtSuffix</name>
+            <value>ExtMapper</value>
+        </param>
+
+        <param>
+            <name>doSuffix</name>
+            <value>DO</value>
+        </param>
+
+    </params>
+
+    <generates>
+
+        <gen id="mapperXml">
+            <template>classpath:template/sample/sqlmap.vm</template>
+            <target>${className}Mapper.xml</target>
+            <!--always ifNot never -->
+            <createStrategy>always</createStrategy>
+            <params>
+                <param>
+                    <name>hah</name>
+                    <value></value>
+                </param>
+            </params>
+        </gen>
+        <gen id="mapperJava">
+            <template>classpath:template/sample/mapper.vm</template>
+            <target>${className}Mapper.java</target>
+            <createStrategy>always</createStrategy>
+            <params>
+                <param>
+                    <name>haaa</name>
+                    <value>hss</value>
+                </param>
+            </params>
+        </gen>
+    </generates>
+    <tables>
+        <table>etb_admin</table>
+        <table>etb_role</table>
+    </tables>
+</config>

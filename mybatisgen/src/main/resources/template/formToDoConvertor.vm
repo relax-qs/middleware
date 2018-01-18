@@ -1,0 +1,44 @@
+package ${formToDoConvertorPackage};
+
+import com.lark.middleware.model.convertor.IDataConvertor;
+import ${doPackage}.${className}${doSuffix};
+import ${formPackage}.${className}${formSuffix};
+
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
+
+
+@Component
+public class ${className}${formToDoConvertorSuffix} implements IDataConvertor<${className}${formSuffix}, ${className}${doSuffix}>, InitializingBean {
+
+    @Override
+    public ${className}${doSuffix} convertor(${className}${formSuffix} ${propertyName}${formSuffix}) {
+        ${className}${doSuffix} ${propertyName}${doSuffix} = new ${className}${doSuffix}();
+        return this.convertor(${propertyName}${formSuffix}, ${propertyName}${doSuffix} );
+    }
+
+    @Override
+    public ${className}${doSuffix} convertor(${className}${formSuffix} ${propertyName}${formSuffix},${className}${doSuffix} ${propertyName}${doSuffix}) {
+#foreach($item in $tableInfo.getColumnFilterByType("gmtCreate", "gmtModified","version"))
+        // ${velocityCount}. ${item.comment}
+        ${propertyName}${doSuffix}.${item.setMethod}(${propertyName}${formSuffix}.${item.getMethod}()) ;
+#end
+        return ${propertyName}${doSuffix};
+    }
+
+    @Override
+    public Class<${className}${formSuffix}> getSourceClass(){
+        return ${className}${formSuffix}.class;
+    }
+
+    @Override
+    public Class<${className}${doSuffix}> getTargetClass(){
+        return ${className}${doSuffix}.class;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.register();
+    }
+
+}

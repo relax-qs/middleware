@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${mapperPackage}.${className}${mapperSuffix}">
+
+    <resultMap id="BaseResultMap" type="${doPackage}.${className}${doSuffix}">
+    #foreach($item in $tableInfo.columns)
+    <result column="${item.columnName}" jdbcType="${item.jdbcType}" property="${item.propName}" />
+    #end</resultMap>
+
+    <sql id="${queryPrefix}_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                <trim prefix="(" prefixOverrides="and" suffix=")">
+                    <foreach collection="criteria.criteria" item="criterion">
+                        <choose>
+                            <when test="criterion.noValue">
+                                and ${criterion.condition}
+                            </when>
+                            <when test="criterion.singleValue">
+                                and ${criterion.condition} #{criterion.value}
+                            </when>
+                            <when test="criterion.betweenValue">
+                                and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                            </when>
+                            <when test="criterion.listValue">
+                                and ${criterion.condition}
+                            <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                #{listItem}
+                            </foreach>
+                            </when>
+                        </choose>
+                    </foreach>
+                </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_${queryPrefix}_Where_Clause">
+        <where>
+            <foreach collection="${queryPrefix.toLowerCase()}.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_Content">
+        <set>
+            <trim  suffixOverrides=",">
+#set($gmtModified=$tableInfo.getGmtModifiedColumn())
+#if($gmtModified)
+                    `${gmtModified.columnName}`=now(),
+#end
+#set($versionColumn=$tableInfo.getVersionColumn())
+#if($versionColumn)
+                    `${versionColumn.columnName}` = `${versionColumn.columnName}` + 1,
+#end
+#foreach($item in $tableInfo.getColumnFilterByType("gmtCreate", "gmtModified","version"))
+                    `${item.columnName}` = #{${item.propName},jdbcType=${item.jdbcType}},
+#end
+            </trim>
+        </set>
+    </sql>
+
+    <sql id="UpdateBy${queryPrefix}_Content">
+        <set>
+            <trim  suffixOverrides=",">
+                #set($gmtModified=$tableInfo.getGmtModifiedColumn())
+                #if($gmtModified)
+                    `${gmtModified.columnName}`=now(),
+                #end
+                #set($versionColumn=$tableInfo.getVersionColumn())
+                #if($versionColumn)
+                    `${versionColumn.columnName}` = `${versionColumn.columnName}` + 1,
+                #end
+                #foreach($item in $tableInfo.getColumnFilterByType("gmtCreate", "gmtModified","version"))
+                    `${item.columnName}` = #{record.${item.propName},jdbcType=${item.jdbcType}},
+                #end
+            </trim>
+        </set>
+    </sql>
+
+    <sql id="updateSelectiveContent">
+        <set>
+            <trim  suffixOverrides=",">
+#set($gmtModified = $tableInfo.getGmtModifiedColunm())
+#if($gmtModified)
+                    `${gmtModified.columnName}`=now(),
+#end
+#if($versionColumn)
+                    `${versionColumn.columnName}` = `${versionColumn.columnName}` + 1,
+#end
+#foreach($item in $tableInfo.getColumnFilterByType("gmtCreate", "gmtModified","version"))
+                    <if test="${item.propName} != null">
+                        `${item.columnName}` = #{${item.propName},jdbcType=${item.jdbcType}},
+                    </if>
+#end
+            </trim>
+        </set>
+    </sql>
+
+    <sql id="updateBy${queryPrefix}SelectiveContent">
+        <set>
+            <trim  suffixOverrides=",">
+                #set($gmtModified = $tableInfo.getGmtModifiedColunm())
+                #if($gmtModified)
+                    `${gmtModified.columnName}`=now(),
+                #end
+                #if($versionColumn)
+                    `${versionColumn.columnName}` = `${versionColumn.columnName}` + 1,
+                #end
+                #foreach($item in $tableInfo.getColumnFilterByType("gmtCreate", "gmtModified","version"))
+                    <if test="record.${item.propName} != null">
+                        `${item.columnName}` = #{record.${item.propName},jdbcType=${item.jdbcType}},
+                    </if>
+                #end
+            </trim>
+        </set>
+    </sql>
+
+    <sql id="Base_Column_List">
+        #foreach($item in $tableInfo.columns) `${item.columnName}` #if($velocityCount !=  $tableInfo.columns.size() ), #end  #end
+    </sql>
+
+    <select id="selectBy${queryPrefix}" parameterType="${queryPackage}.${className}${queryPrefix}" resultMap="BaseResultMap">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+            from ${tableSchema}.${tableName}
+        <if test="_parameter != null">
+            <include refid="${queryPrefix}_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <include refid="MysqlDialectSuffix" />
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        from ${tableSchema}.${tableName}
+        where
+        #set($idColumn=$tableInfo.getIdColumn())
+        ${idColumn.columnName} = #{${idColumn.propName},jdbcType=${idColumn.jdbcType}}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from ${tableSchema}.${tableName}
+        where #set($idColumn=$tableInfo.getIdColumn())
+        ${idColumn.columnName} = #{${idColumn.propName},jdbcType=${idColumn.jdbcType}}
+    </delete>
+
+    <delete id="deleteBy${queryPrefix}" parameterType="${queryPackage}.${className}${queryPrefix}">
+        delete from ${tableSchema}.${tableName}
+        <if test="_parameter != null">
+            <include refid="${queryPrefix}_Where_Clause" />
+        </if>
+    </delete>
+
+    <insert id="insertSelective" parameterType="${doPackage}.${className}${doSuffix}">
+        <selectKey keyProperty="${tableInfo.getIdColumn().propName}" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into ${tableSchema}.${tableName}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+#set($gmtCreate=$tableInfo.getGmtCreateColumn())
+#if($gmtCreate)
+            `${gmtCreate.columnName}`,
+#end
+#set($gmtModified=$tableInfo.getGmtModifiedColumn())
+#if($gmtModified)
+            `${gmtModified.columnName}`,
+#end
+#set($versionColumn=$tableInfo.getVersionColumn())
+#if($versionColumn)
+            `${versionColumn.columnName}`,
+#end
+#foreach($item in $tableInfo.getColumnFilterByType("gmtCreate", "gmtModified","version"))
+            <if test="${item.propName} != null">
+                `${item.columnName}`,
+            </if>
+#end
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+#if($gmtCreate)
+                now(),
+#end
+#if($gmtModified)
+                now(),
+#end
+#if($versionColumn)
+                0,
+#end
+#foreach($item in $tableInfo.getColumnFilterByType("gmtCreate", "gmtModified","version"))
+            <if test="${item.propName} != null">
+                #{${item.propName},jdbcType=${item.jdbcType}},
+            </if>
+#end
+        </trim>
+    </insert>
+
+    <select id="countBy${queryPrefix}" parameterType="${queryPackage}.${className}${queryPrefix}" resultType="java.lang.Integer">
+        select count(*) from ${tableSchema}.${tableName}
+        <if test="_parameter != null">
+            <include refid="${queryPrefix}_Where_Clause" />
+        </if>
+    </select>
+
+    <update id="updateBy${queryPrefix}Selective" parameterType="map">
+        update ${tableSchema}.${tableName}
+        <include refid="updateBy${queryPrefix}SelectiveContent" />
+        <if test="_parameter != null">
+            <include refid="Update_By_${queryPrefix}_Where_Clause" />
+        </if>
+        <include refid="UpdateByQueryLimit" />
+    </update>
+
+    <update id="updateBy${queryPrefix}" parameterType="map">
+        update ${tableSchema}.${tableName}
+        <include refid="UpdateBy${queryPrefix}_Content" />
+        <if test="_parameter != null">
+            <include refid="Update_By_${queryPrefix}_Where_Clause" />
+        </if>
+        <include refid="UpdateByQueryLimit" />
+    </update>
+
+    <update id="updateByPrimaryKeySelective" parameterType="${doPackage}.${className}${doSuffix}">
+        update ${tableSchema}.${tableName}
+        <include refid="updateSelectiveContent" />
+        where
+        #set($idColumn=$tableInfo.getIdColumn())
+        ${idColumn.columnName} = #{${idColumn.propName},jdbcType=${idColumn.jdbcType}}
+
+        #set($versionColumn=$tableInfo.getVersionColumn())
+        #if($versionColumn)
+            and  ${versionColumn.columnName} = #{${versionColumn.propName},jdbcType=${versionColumn.jdbcType}}
+        #end
+
+
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="${doPackage}.${className}${doSuffix}">
+        update ${tableSchema}.${tableName}
+        <include refid="Update_Content" />
+        where
+        #set($idColumn=$tableInfo.getIdColumn())
+        ${idColumn.columnName} = #{${idColumn.propName},jdbcType=${idColumn.jdbcType}}
+
+        #set($versionColumn=$tableInfo.getVersionColumn())
+        #if($versionColumn)
+            and  ${versionColumn.columnName} = #{${versionColumn.propName},jdbcType=${versionColumn.jdbcType}}
+        #end
+
+    </update>
+
+    <sql id="MysqlDialectSuffix">
+        <if test="pageOffset &gt;= 0 and pageSize &gt; 0">
+            <![CDATA[ LIMIT #{pageOffset,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER} ]]>
+        </if>
+    </sql>
+
+
+    <sql id="UpdateByQueryLimit">
+        LIMIT #{query.pageSize,jdbcType=INTEGER}
+    </sql>
+
+</mapper>

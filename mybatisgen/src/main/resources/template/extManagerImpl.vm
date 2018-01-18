@@ -1,0 +1,19 @@
+package ${extManagerImplPackage};
+
+import ${managerImplPackage}.${className}${managerImplSuffix};
+import ${extManagerPackage}.${className}${extManagerSuffix};
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+
+
+/**
+ * Manager for ${className}.
+ * 扩展的manager实现
+ */
+
+@Component
+public class ${className}${extManagerImplSuffix} extends  ${className}${managerImplSuffix} implements ${className}${extManagerSuffix}{
+
+}
